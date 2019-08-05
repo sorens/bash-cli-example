@@ -35,6 +35,7 @@ Usage: sample-cli [options...]
   -v,  --version                 display the version                               
   --foo                          display 'foo'                                     
   -b,  --bar                     display 'bar'                                     
+  -mc, --multi-command           demonstrate a command that takes multipe parameters
   -vl, --very-very-long-command  display a very long command                       
 ```
 
@@ -50,8 +51,14 @@ foo!
 ## An illegal option
 
 ```bash
-[sorens | ~/src/sample-cli> ./sample-cli -r
-unknown command
+[sorens | ~/src/sample-cli> ./sample-cli --nothing
+unknown command '--nothing'
 try 'sample-cli --help' for more information
-[sorens | ~/src/sample-cli> 
+```
+
+## Multiple parameters in a command
+
+```bash
+[sorens | ~/src/sample-cli> ./sample-cli -mc --baz hi
+multi-command triggered, baz: 'hi'
 ```

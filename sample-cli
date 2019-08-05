@@ -9,6 +9,8 @@ HELP=false
 FOO=false
 BAR=false
 LONG_COMMAND=false
+MULTI_COMMAND=false
+BAZ=""
 
 # example functions to process
 foo() {
@@ -24,6 +26,12 @@ bar() {
 long_command() {
     echo "a long command!"
     exit $1
+}
+
+multi_command() {
+    # when multi-command is triggered, we'll be expecting a baz value as well
+    echo "multi-command triggered, baz: '$1'"
+    exit $2
 }
 
 declare -i offset=6
@@ -120,6 +128,7 @@ help() {
     # some contrived commands to show off the help
     command "" "--foo" "display 'foo'"
     command "-b" "--bar" "display 'bar'"
+    command "-mc" "--multi-command" "demonstrate a command that takes multipe parameters"
     command "-vl" "--very-very-long-command" "display a very long command"
 
     print_all_commands
@@ -155,6 +164,17 @@ do
         LONG_COMMAND=true
         shift
     ;;
+    -mc|--multi-command)
+        MULTI_COMMAND=true
+        shift   # shift to get to the next parameter, which is --baz
+        if [[ $1 != "--baz" ]];
+        then
+            min_help 1
+        fi
+        shift   # shift again to see the value of the --baz parameter
+        BAZ=$1
+        shift
+    ;;
   esac
 done
 
@@ -183,5 +203,14 @@ then
     long_command 0
 fi
 
-echo "unknown command"
+if [[ $MULTI_COMMAND ]];
+then
+    if [[ ! -z "$BAZ" ]];
+    then
+        multi_command $BAZ 0
+    fi
+fi
+
+# boiler plate, we reached the end with no recognizable command
+echo "unknown command '$@'"
 min_help 1
