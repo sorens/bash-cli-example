@@ -11,23 +11,23 @@ declare -r version="1.0"
 # add/remove/update functions here...
 foo() {
     echo "foo!"
-    exit $1
+    exit "$1"
 }
 
 bar() {
     echo "bar!"
-    exit $1
+    exit "$1"
 }
 
 long_command() {
     echo "a long command!"
-    exit $1
+    exit "$1"
 }
 
 multi_command() {
     # when multi-command is triggered, we'll be expecting a baz value as well
     echo "multi-command triggered, baz: '$1'"
-    exit $2
+    exit "$2"
 }
 
 ##############################################
@@ -64,12 +64,12 @@ command "-v" "--version" "display the version"
 
 version() {
     echo "$app_name version: $version"
-    exit $1
+    exit "$1"
 }
 
 min_help() {
     echo "try '$app_name --help' for more information"
-    exit $1
+    exit "$1"
 }
 
 print_command() {
@@ -91,13 +91,14 @@ print_command() {
     long_command=$(printf '%s' "$long_command")
 
     # calculate how much padding we'll need for the help section
-    local temp=$(printf "  %s%s" "$short_command" "$long_command")
+    declare temp
+    temp="$(printf "  %s%s" "$short_command" "$long_command")"
     remaining_padding=padding-${#temp}
     printf "%s" "$temp"
 
     # pad for the help section
     local i
-    for ((i=0; i<$remaining_padding; i++))
+    for ((i=0; i<remaining_padding; i++))
     do
         printf " "
     done
@@ -133,26 +134,26 @@ print_all_commands() {
 
 help() {
     printf "\n"
-    printf "Usage: $app_name [options...]\n"
+    printf "Usage: %s [options...]\n" $app_name
     printf "\n"
 
     # some contrived commands to show off the help
     # add/remove/update commands here to match commands that your cli supports
     command "" "--foo" "display 'foo'"
     command "-b" "--bar" "display 'bar'"
-    command "-mc" "--multi-command" "demonstrate a command that takes multipe parameters"
+    command "-mc" "--multi-command" "multiple parameters (e.g. --baz test)"
     command "-vl" "--very-very-long-command" "display a very long command"
 
     # boiler plate, do not remove
     print_all_commands
 
-    exit $1
+    exit "$1"
 }
 
 # process commands do stuff!
 
 # if no commands were entered, show the minimum help
-if [[ -z $@ ]]; then
+if [[ -z $* ]]; then
     min_help 0
 fi
 
@@ -237,5 +238,5 @@ then
 fi
 
 # boiler plate, we reached the end with no recognizable command
-echo "unknown command '$@'"
+echo "unknown command '$*'"
 min_help 1
