@@ -3,16 +3,12 @@
 # an example of a bash command-line script
 # the help section is auto-formatted to look legit
 
-# booleans to tell which function to process
-VERSION=false
-HELP=false
-FOO=false
-BAR=false
-LONG_COMMAND=false
-MULTI_COMMAND=false
-BAZ=""
+# change the name of the app and the version number as needed...
+declare -r app_name="sample-cli"
+declare -r version="1.0"
 
 # example functions to process
+# add/remove/update functions here...
 foo() {
     echo "foo!"
     exit $1
@@ -34,10 +30,21 @@ multi_command() {
     exit $2
 }
 
+##############################################
+################ BOILER PLATE ################
+##############################################
+
+# booleans to tell which function to process
+VERSION=false
+HELP=false
+FOO=false
+BAR=false
+LONG_COMMAND=false
+MULTI_COMMAND=false
+BAZ=""
+
 declare -i offset=6
 declare -i min_column=30
-declare -r app_name="sample-cli"
-declare -r version="1.0"
 declare -a command_short=()
 declare -a command_long=()
 declare -a command_description=()
@@ -120,35 +127,47 @@ print_all_commands() {
     done
 }
 
+##############################################
+################ BOILER PLATE ################
+##############################################
+
 help() {
     printf "\n"
     printf "Usage: $app_name [options...]\n"
     printf "\n"
 
     # some contrived commands to show off the help
+    # add/remove/update commands here to match commands that your cli supports
     command "" "--foo" "display 'foo'"
     command "-b" "--bar" "display 'bar'"
     command "-mc" "--multi-command" "demonstrate a command that takes multipe parameters"
     command "-vl" "--very-very-long-command" "display a very long command"
 
+    # boiler plate, do not remove
     print_all_commands
 
     exit $1
 }
 
+# process commands do stuff!
+
+# if no commands were entered, show the minimum help
 if [[ -z $@ ]]; then
     min_help 0
 fi
 
-# read in parameters
+# read each parameter to determine which command to run with which parameters
+# add/remove/update case statements here to match your commands and functions...
 for i in "$@"
 do
     case $i in
     -h|--help)
+        # boiler plate, do not remove
         HELP=true
         shift
     ;;
     -v|--version)
+        # boiler plate, do not remove
         VERSION=true
         shift
     ;;
@@ -178,16 +197,19 @@ do
   esac
 done
 
+# boiler plate, do not remove
 if $HELP
 then
     help 0
 fi
 
+# boiler plate, do not remove
 if $VERSION
 then
     version 0
 fi
 
+# check if your command has been triggered, if so, run your function
 if $FOO
 then
     foo 0
