@@ -1,0 +1,184 @@
+#!/bin/bash
+
+# an example of a bash command-line script
+# the help section is auto-formatted to look legit
+
+# booleans to tell which function to process
+VERSION=false
+HELP=false
+FOO=false
+BAR=false
+LONG_COMMAND=false
+
+# example functions to process
+foo() {
+    echo "foo!"
+    exit $1
+}
+
+bar() {
+    echo "bar!"
+    exit $1
+}
+
+long_command() {
+    echo "a long command!"
+    exit $1
+}
+
+declare -i offset=6
+declare -i min_column=30
+declare -r app_name="sample-cli"
+declare -r version="1.0"
+declare -a command_short=()
+declare -a command_long=()
+declare -a command_description=()
+declare -i command_count=0
+
+command() {
+    # build the command structure: short format, long format, description
+    command_short[$command_count]=$1
+    command_long[$command_count]=$2
+    command_description[$command_count]=$3
+    command_count+=1
+}
+
+# the help and version command
+command "-h" "--help" "display this help message"
+command "-v" "--version" "display the version"
+
+version() {
+    echo "$app_name version: $version"
+    exit $1
+}
+
+min_help() {
+    echo "try '$app_name --help' for more information"
+    exit $1
+}
+
+print_command() {
+    local padding=$1
+    local short_command=$2
+    local long_command=$3
+    local desc=$4
+
+    # check if we have a short command
+    if [[ -z $short_command ]];
+    then
+        short_command=""
+    else
+        short_command="${short_command},"
+        short_command=$(printf '%-5s' "$short_command")
+    fi
+
+    long_command=$(printf '%s' "$long_command")
+
+    # calculate how much padding we'll need for the help section
+    local temp=$(printf "  %s%s" "$short_command" "$long_command")
+    remaining_padding=$padding-${#temp}
+    printf "%s" "$temp"
+
+    # pad for the help section
+    local i
+    for ((i=0; i<$remaining_padding; i++))
+    do
+        printf " "
+    done
+
+    # print the help section
+    printf '%-50s\n' "$desc"
+}
+
+print_all_commands() {
+    local check=0
+    # how much room do we need for long commands?
+    column=$min_column
+    for ((i=0; i < command_count; i++))
+    do
+        check=${#command_long[$i]}+${#command_short[$i]+offset}
+        if (( $column < $check )); then
+            column=$check+offset
+        fi
+    done
+
+    # print all the commands now
+    for ((i=0; i<command_count; i++))
+    do
+        print_command $column "${command_short[$i]}" "${command_long[$i]}" "${command_description[$i]}"
+    done
+}
+
+help() {
+    printf "\n"
+    printf "Usage: $app_name [options...]\n"
+    printf "\n"
+
+    # some contrived commands to show off the help
+    command "" "--foo" "display 'foo'"
+    command "-b" "--bar" "display 'bar'"
+    command "-vl" "--very-very-long-long-command" "display a very long command"
+
+    print_all_commands
+
+    exit $1
+}
+
+if [[ -z $@ ]]; then
+    min_help 0
+fi
+
+# read in parameters
+for i in "$@"
+do
+    case $i in
+    -h|--help)
+        HELP=true
+        shift
+    ;;
+    -v|--version)
+        VERSION=true
+        shift
+    ;;
+    --foo)
+        FOO=true
+        shift
+    ;;
+    -b|--bar)
+        BAR=true
+        shift
+    ;;
+    -vl|--very-very-long-long-command)
+        LONG_COMMAND=true
+        shift
+    ;;
+  esac
+done
+
+if $HELP
+then
+    help 0
+fi
+
+if $VERSION
+then
+    version 0
+fi
+
+if $FOO
+then
+    foo 0
+fi
+
+if $BAR
+then
+    bar 0
+fi
+
+if $LONG_COMMAND
+then
+    long_command 0
+fi
+
+echo "unknown command"
+min_help 1
