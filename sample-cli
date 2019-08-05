@@ -58,10 +58,11 @@ min_help() {
 }
 
 print_command() {
-    local padding=$1
+    declare -i padding=$1
     local short_command=$2
     local long_command=$3
     local desc=$4
+    declare -i remaining_padding=0
 
     # check if we have a short command
     if [[ -z $short_command ]];
@@ -76,7 +77,7 @@ print_command() {
 
     # calculate how much padding we'll need for the help section
     local temp=$(printf "  %s%s" "$short_command" "$long_command")
-    remaining_padding=$padding-${#temp}
+    remaining_padding=padding-${#temp}
     printf "%s" "$temp"
 
     # pad for the help section
@@ -91,14 +92,16 @@ print_command() {
 }
 
 print_all_commands() {
-    local check=0
+    declare -i check=0
     # how much room do we need for long commands?
-    column=$min_column
-    for ((i=0; i < command_count; i++))
+    declare -i column=min_column
+    declare -i i=0
+
+    for ((; i < command_count; i++))
     do
-        check=${#command_long[$i]}+${#command_short[$i]+offset}
-        if (( $column < $check )); then
-            column=$check+offset
+        check=${#command_long[$i]}+${#command_short[$i]}+offset
+        if (( column < check )); then
+            column=check
         fi
     done
 
@@ -117,7 +120,7 @@ help() {
     # some contrived commands to show off the help
     command "" "--foo" "display 'foo'"
     command "-b" "--bar" "display 'bar'"
-    command "-vl" "--very-very-long-long-command" "display a very long command"
+    command "-vl" "--very-very-long-command" "display a very long command"
 
     print_all_commands
 
