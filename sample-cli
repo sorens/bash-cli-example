@@ -188,10 +188,16 @@ do
         shift   # shift to get to the next parameter, which is --baz
         if [[ $1 != "--baz" ]];
         then
-            min_help 1
+            echo "missing --baz parameter"
+            help 1
         fi
         shift   # shift again to see the value of the --baz parameter
         BAZ=$1
+        if [[ -z "$BAZ" ]];
+        then
+            echo "missing value for --baz parameter"
+            help 1
+        fi
         shift
     ;;
   esac
@@ -227,10 +233,7 @@ fi
 
 if [[ $MULTI_COMMAND ]];
 then
-    if [[ ! -z "$BAZ" ]];
-    then
-        multi_command $BAZ 0
-    fi
+    multi_command "$BAZ" 0
 fi
 
 # boiler plate, we reached the end with no recognizable command
