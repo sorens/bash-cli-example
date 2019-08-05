@@ -31,11 +31,11 @@ The standard help screen displays using a 30 character column.
 
 Usage: sample-cli [options...]
 
-  -h,  --help                         display this help message                         
-  -v,  --version                      display the version                               
-  --foo                               display 'foo'                                     
-  -b,  --bar                          display 'bar'                                     
-  -vl, --very-very-long-long-command  display a very long command
+  -h,  --help                    display this help message                         
+  -v,  --version                 display the version                               
+  --foo                          display 'foo'                                     
+  -b,  --bar                     display 'bar'                                     
+  -vl, --very-very-long-command  display a very long command                       
 ```
 
 If you create a long detailed command name, the help column will begin two spaces after the end of the detailed command name.
