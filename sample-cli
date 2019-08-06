@@ -232,7 +232,7 @@ then
     long_command 0
 fi
 
-if [[ $MULTI_COMMAND ]];
+if $MULTI_COMMAND
 then
     multi_command "$BAZ" 0
 fi
